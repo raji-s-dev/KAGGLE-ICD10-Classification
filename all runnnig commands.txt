@@ -1,0 +1,296 @@
+test command
+
+(icd10) PS D:\Kaggle - Copy - Copy> python src/test_mlp_upgraded.py `
+>>   --test-path "./data/test_data.npy" `
+>>   --model-path "./outputs/mlp_v1/best_mlp.pt" `
+>>   --scaler-path "./outputs/mlp_v1/splits_scaled/scaler.json" `
+>>   --codes-path "./data/cleaned_unique_icd10_codes.txt" `
+>>   --out-csv "./outputs/submission.csv" `
+>>   --hidden-dims 1024 512 512 256 `
+>>   --dropout 0.4 `
+>>   --global-threshold 0.65
+>>
+
+
+
+validate cmd
+
+python validate_mlp_upgraded.py `
+  --X-val "../outputs/mlp_v1/splits_scaled/X_val.npy" `
+  --Y-val "../outputs/mlp_v1/splits_scaled/Y_val.npy" `
+  --model-path "../outputs/mlp_v1/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/splits_scaled/scaler.json"
+
+threshold specified
+
+python validate_mlp_upgraded.py `
+  --X-val "../outputs/mlp_v1/splits_scaled/X_val.npy" `
+  --Y-val "../outputs/mlp_v1/splits_scaled/Y_val.npy" `
+  --model-path "../outputs/mlp_v1/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/splits_scaled/scaler.json" `
+  --thresholds 0.60 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.70
+
+
+
+
+validate with perlabel
+
+python validate_mlp_perlabel.py `
+  --X-val "../outputs/mlp_v1/splits_scaled/X_val.npy" `
+  --Y-val "../outputs/mlp_v1/splits_scaled/Y_val.npy" `
+  --model-path "../outputs/mlp_v1/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/splits_scaled/scaler.json" `
+  --perlabel-threshold-path "../outputs/mlp_v1/thresholds_greedy/thresholds.npy"
+
+
+
+
+
+test cmd for threshold.npy applying
+
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/thresholds_greedy/thresholds_blend.npy" `
+  --out-csv "../outputs/mlp_v1/submission_blend.csv"
+
+
+
+
+new model training cmds
+
+# Seed 42
+python train_mlp_upgraded.py `
+  --data-dir "D:/Kaggle - Copy - Copy - Copy/preprocessed" `
+  --out-dir "D:/Kaggle - Copy - Copy - Copy/outputs/mlp_v1/seed_42" `
+  --seed 42 `
+  --epochs 30 `
+  --batch-size 512
+
+# Seed 123
+python train_mlp_upgraded.py `
+  --data-dir "D:/Kaggle - Copy - Copy - Copy/preprocessed" `
+  --out-dir "D:/Kaggle - Copy - Copy - Copy/outputs/mlp_v1/seed_123" `
+  --seed 123 `
+  --epochs 30 `
+  --batch-size 512
+
+# Seed 2025
+python train_mlp_upgraded.py `
+  --data-dir "D:/Kaggle - Copy - Copy - Copy/preprocessed" `
+  --out-dir "D:/Kaggle - Copy - Copy - Copy/outputs/mlp_v1/seed_2025" `
+  --seed 2025 `
+  --epochs 30 `
+  --batch-size 512
+
+# seed 777
+python train_mlp_upgraded.py `
+  --data-dir "D:/Kaggle - Copy - Copy - Copy/preprocessed" `
+  --out-dir "D:/Kaggle - Copy - Copy - Copy/outputs/mlp_v1/seed_777" `
+  --seed 777 `
+  --epochs 30 `
+  --batch-size 512
+
+
+
+
+
+
+
+
+
+
+
+
+
+📌 So you’ll do this 5 times, once per seed:
+
+🔧 Seed 42
+
+python optimize_thresholds.py `
+  --X-val "../outputs/mlp_v1/seed_42/splits_scaled/X_val.npy" `
+  --Y-val "../outputs/mlp_v1/seed_42/splits_scaled/Y_val.npy" `
+  --model-path "../outputs/mlp_v1/seed_42/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_42/splits_scaled/scaler.json" `
+  --out-dir "../outputs/mlp_v1/seed_42/thresholds_greedy" `
+  --mode greedy `
+  --init-threshold 0.65 `
+  --grid-start 0.30 --grid-end 0.70 --grid-steps 41 `
+  --max-iters 3 `
+  --batch-size 512
+
+
+🔧 Seed 123
+
+python optimize_thresholds.py `
+  --X-val "../outputs/mlp_v1/seed_123/splits_scaled/X_val.npy" `
+  --Y-val "../outputs/mlp_v1/seed_123/splits_scaled/Y_val.npy" `
+  --model-path "../outputs/mlp_v1/seed_123/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_123/splits_scaled/scaler.json" `
+  --out-dir "../outputs/mlp_v1/seed_123/thresholds_greedy" `
+  --mode greedy `
+  --init-threshold 0.65 `
+  --grid-start 0.30 --grid-end 0.70 --grid-steps 41 `
+  --max-iters 3 `
+  --batch-size 512
+
+
+🔧 Seed 2025
+
+python optimize_thresholds.py `
+  --X-val "../outputs/mlp_v1/seed_2025/splits_scaled/X_val.npy" `
+  --Y-val "../outputs/mlp_v1/seed_2025/splits_scaled/Y_val.npy" `
+  --model-path "../outputs/mlp_v1/seed_2025/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_2025/splits_scaled/scaler.json" `
+  --out-dir "../outputs/mlp_v1/seed_2025/thresholds_greedy" `
+  --mode greedy `
+  --init-threshold 0.65 `
+  --grid-start 0.30 --grid-end 0.70 --grid-steps 41 `
+  --max-iters 3 `
+  --batch-size 512
+
+
+🔧 Seed 777
+
+python optimize_thresholds.py `
+  --X-val "../outputs/mlp_v1/seed_777/splits_scaled/X_val.npy" `
+  --Y-val "../outputs/mlp_v1/seed_777/splits_scaled/Y_val.npy" `
+  --model-path "../outputs/mlp_v1/seed_777/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_777/splits_scaled/scaler.json" `
+  --out-dir "../outputs/mlp_v1/seed_777/thresholds_greedy" `
+  --mode greedy `
+  --init-threshold 0.65 `
+  --grid-start 0.30 --grid-end 0.70 --grid-steps 41 `
+  --max-iters 3 `
+  --batch-size 512
+
+
+🔧 Seed 999
+
+python optimize_thresholds.py `
+  --X-val "../outputs/mlp_v1/seed_999/splits_scaled/X_val.npy" `
+  --Y-val "../outputs/mlp_v1/seed_999/splits_scaled/Y_val.npy" `
+  --model-path "../outputs/mlp_v1/seed_999/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_999/splits_scaled/scaler.json" `
+  --out-dir "../outputs/mlp_v1/seed_999/thresholds_greedy" `
+  --mode greedy `
+  --init-threshold 0.65 `
+  --grid-start 0.30 --grid-end 0.70 --grid-steps 41 `
+  --max-iters 3 `
+  --batch-size 512
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+📦 Example commands for all 5 seeds:
+Seed 42
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_42/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_42/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_42/thresholds_greedy/thresholds.npy" `
+  --out-csv "../outputs/mlp_v1/seed_42/pred_seed_42.csv"
+
+Seed 123
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_123/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_123/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_123/thresholds_greedy/thresholds.npy" `
+  --out-csv "../outputs/mlp_v1/seed_123/pred_seed_123.csv"
+
+Seed 2025
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_2025/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_2025/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_2025/thresholds_greedy/thresholds.npy" `
+  --out-csv "../outputs/mlp_v1/seed_2025/pred_seed_2025.csv"
+
+Seed 777
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_777/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_777/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_777/thresholds_greedy/thresholds.npy" `
+  --out-csv "../outputs/mlp_v1/seed_777/pred_seed_777.csv"
+
+Seed 999
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_999/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_999/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_999/thresholds_greedy/thresholds.npy" `
+  --out-csv "../outputs/mlp_v1/seed_999/pred_seed_999.csv"
+
+
+
+
+
+
+testing all upgraded model with blend threshold 
+
+Seed 42
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_42/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_42/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_42/thresholds_greedy/thresholds_blend.npy" `
+  --out-csv "../outputs/mlp_v1/seed_42/blendpred_seed_42.csv"
+
+Seed 123
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_123/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_123/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_123/thresholds_greedy/thresholds_blend.npy" `
+  --out-csv "../outputs/mlp_v1/seed_123/blendpred_seed_123.csv"
+
+Seed 2025
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_2025/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_2025/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_2025/thresholds_greedy/thresholds_blend.npy" `
+  --out-csv "../outputs/mlp_v1/seed_2025/blendpred_seed_2025.csv"
+
+Seed 777
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_777/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_777/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_777/thresholds_greedy/thresholds_blend.npy" `
+  --out-csv "../outputs/mlp_v1/seed_777/blendpred_seed_777.csv"
+
+Seed 999
+python test_mlp_upgraded.py `
+  --test-path "../data/test_data.npy" `
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" `
+  --model-path "../outputs/mlp_v1/seed_999/best_mlp.pt" `
+  --scaler-path "../outputs/mlp_v1/seed_999/splits_scaled/scaler.json" `
+  --thresholds-path "../outputs/mlp_v1/seed_999/thresholds_greedy/thresholds_blend.npy" `
+  --out-csv "../outputs/mlp_v1/seed_999/blendpred_seed_999.csv"
+
+
