@@ -1,90 +1,122 @@
-🏆 ICD10 Classification – Kaggle 1st Place Solution
+MLP Model Pipeline – README
+Overview
 
-We are proud to announce that our team secured 🥇 1st Place on the Kaggle ICD10 Classification Competition leaderboard with a final micro-F₂ score of 0.533. 🎉
+This repository contains a full pipeline for training, optimizing, and testing a Multi-Layer Perceptron (MLP) model for multi-label classification tasks. The workflow includes:
 
-📌 Project Overview
+Downloading datasets
 
-Medical coding is the process of assigning ICD10 codes to electronic health records (EHRs). This task is usually manual, time-consuming, and error-prone.
+Training models with multiple seeds
 
-In this project, we solved the ICD10 multi-label classification problem using GatorTron embeddings (1024-dimensional clinical language model embeddings) and machine learning models.
+Optimizing prediction thresholds
 
-Dataset:
+Testing models with blended thresholds
 
-~200,000 training records
+Generating final submission
 
-~99,500 test records
+The workflow is designed for code reusability and easy replication across different seeds or datasets.
 
-~1,400 unique ICD10 codes
+1. Download Datasets
 
-Features: 1024-dim embeddings per record
+Run the following command to download all required datasets:
 
-Goal: Predict ICD10 codes for unseen patient records.
+python download_data.py
 
-Evaluation Metric: Average Micro-F₂ score.
+2. Training Models
 
-⚙️ Approach
-🔹 Step 1 – Data Preprocessing
+Train the upgraded MLP model using different random seeds. Update --data-dir and --out-dir as needed.
 
-Normalized embeddings.
+Training Commands
+# Seed 42
+python train_mlp_upgraded.py \
+  --data-dir "D:/Kaggle/preprocessed" \
+  --out-dir "D:/Kaggle/outputs/mlp_v1/seed_42" \
+  --seed 42 \
+  --epochs 30 \
+  --batch-size 512
 
-Converted ICD10 labels into multi-hot vectors.
+# Seed 123
+python train_mlp_upgraded.py \
+  --data-dir "D:/Kaggle/preprocessed" \
+  --out-dir "D:/Kaggle/outputs/mlp_v1/seed_123" \
+  --seed 123 \
+  --epochs 30 \
+  --batch-size 512
 
-🔹 Step 2 – Model Training
+# Seed 2025
+python train_mlp_upgraded.py \
+  --data-dir "D:/Kaggle/preprocessed" \
+  --out-dir "D:/Kaggle/outputs/mlp_v1/seed_2025" \
+  --seed 2025 \
+  --epochs 30 \
+  --batch-size 512
 
-Base model: Multi-Layer Perceptron (MLP) with dropout and hidden layers.
-
-Loss functions explored:
-
-Binary Cross-Entropy (BCE) → baseline
-
-Focal Loss → moderate improvement
-
-Asymmetric Loss (ASL) → best performance
-
-🔹 Step 3 – Threshold Tuning
-
-Global threshold sweeping (0.32–0.45).
-
-Per-label thresholds improved recall on rare ICD codes.
-
-🔹 Step 4 – Ensembling
-
-Trained 10 MLP models with different random seeds.
-
-Voting ensembles improved robustness.
-
-Weighted ensemble (based on validation F1) gave the best final score.
-
-📊 Results
-Model Type	Public Score	Final Score
-Single MLP (BCE)	0.494	0.496
-Single MLP (ASL)	0.506	0.509
-Ensemble (Voting, 10 seeds)	0.525	0.525
-Weighted Ensemble (Final)	0.531	0.533
-
-✅ Final Leaderboard Rank: #1
-
-🚀 Key Highlights
-
-First-place solution among all competing teams.
-
-Demonstrated effectiveness of ASL loss + ensembling + threshold tuning.
-
-Automated ICD10 classification using embeddings (without raw text).
-
-Scalable, robust, and applicable to real-world medical coding.
+# Seed 777
+python train_mlp_upgraded.py \
+  --data-dir "D:/Kaggle/preprocessed" \
+  --out-dir "D:/Kaggle/outputs/mlp_v1/seed_777" \
+  --seed 777 \
+  --epochs 30 \
+  --batch-size 512
 
 
+Repeat this process for all seeds you plan to use.
 
-📖 References
+3. Optimize Thresholds
 
-Kaggle Competition: ICD10 Classification
+After training, optimize the prediction thresholds using validation data for each seed. Adjust --init-threshold, --grid-start, --grid-end, --grid-steps, and --max-iters for fine-tuning.
 
-ICD-10 Official Documentation
+python optimize_thresholds.py \
+  --X-val "../outputs/mlp_v1/seed_42/splits_scaled/X_val.npy" \
+  --Y-val "../outputs/mlp_v1/seed_42/splits_scaled/Y_val.npy" \
+  --model-path "../outputs/mlp_v1/seed_42/best_mlp.pt" \
+  --scaler-path "../outputs/mlp_v1/seed_42/splits_scaled/scaler.json" \
+  --out-dir "../outputs/mlp_v1/seed_42/thresholds_greedy" \
+  --mode greedy \
+  --init-threshold 0.65 \
+  --grid-start 0.30 --grid-end 0.70 --grid-steps 41 \
+  --max-iters 3 \
+  --batch-size 512
 
-GatorTron: Large Clinical Language Model
 
-✨ Team Victory
+Repeat this step for each seed.
 
-This project is a testament to smart experimentation, rigorous validation, and teamwork.
-We not only built a robust machine learning pipeline but also delivered a winning solution to a real-world medical coding challenge.
+4. Blend Thresholds
+
+Once all thresholds are optimized, blend them to improve final predictions:
+
+python threshold_blender.py
+
+
+This script generates blended thresholds for testing.
+
+5. Test Models
+
+Test all upgraded models using the blended thresholds:
+
+# Seed 42
+python test_mlp_upgraded.py \
+  --test-path "../data/test_data.npy" \
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" \
+  --model-path "../outputs/mlp_v1/seed_42/best_mlp.pt" \
+  --scaler-path "../outputs/mlp_v1/seed_42/splits_scaled/scaler.json" \
+  --thresholds-path "../outputs/mlp_v1/seed_42/thresholds_greedy/thresholds_blend.npy" \
+  --out-csv "../outputs/mlp_v1/seed_42/blendpred_seed_42.csv"
+
+
+Repeat for all seeds: 123, 2025, 777, 999, etc.
+
+6. Generate Submission
+
+Finally, generate the submission file:
+
+python generate_submission.py
+
+Notes
+
+Ensure all directory paths exist before running scripts.
+
+Recommended batch size: 512. Adjust depending on available GPU/CPU memory.
+
+The workflow is seed-agnostic: simply add or remove seeds as needed.
+
+Maintain consistent directory structure to ensure reusability.
