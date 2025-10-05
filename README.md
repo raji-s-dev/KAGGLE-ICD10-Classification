@@ -58,7 +58,7 @@ This script automatically downloads the shared Google Drive folder:
 
 https://drive.google.com/drive/folders/1q_LOeGmRC0b33faVXxJIQUMmpODC9Ayh?usp=sharing
 All files will be stored in your current working directory.
-
+---
 🚀 Quick Start
 1️⃣ Test Pre-trained Models
 After downloading data:
@@ -75,6 +75,7 @@ Then ensemble all prediction CSVs:
 
 
 python src/generate_submission.py
+---
 2️⃣ Train From Scratch (Optional)
 Example for seed 42:
 
@@ -85,6 +86,7 @@ python src/train_mlp_upgraded.py \
   --seed 42 \
   --epochs 30 \
   --batch-size 512
+  ---
 3️⃣ Optimize Thresholds
 Run threshold optimization for each seed:
 
@@ -100,11 +102,13 @@ python src/optimize_thresholds.py \
   --grid-start 0.30 --grid-end 0.70 --grid-steps 41 \
   --max-iters 3 \
   --batch-size 512
+  ---
 4️⃣ Blend Thresholds
 Combine optimized thresholds across seeds:
 
 
 python src/threshold_blender.py
+---
 5️⃣ Final Testing with Blended Thresholds
 
 python src/test_mlp_upgraded.py \
