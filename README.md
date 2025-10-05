@@ -79,7 +79,7 @@ python src/generate_submission.py
 2️⃣ Train From Scratch (Optional)
 Example for seed 42:
 
-
+```bash
 python src/train_mlp_upgraded.py \
   --data-dir "D:/Kaggle/preprocessed" \
   --out-dir "D:/Kaggle/outputs/mlp_v1/seed_42" \
