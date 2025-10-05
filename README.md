@@ -41,8 +41,7 @@ We addressed the ICD-10 medical coding challenge as a multi-label text embedding
 │ └── download_data.py
 └── README.md
 
-yaml
-Copy code
+
 
 > **Note:**  
 > Datasets, preprocessed embeddings, and trained models are hosted on Google Drive.
@@ -52,12 +51,11 @@ Copy code
 ## 📥 Downloading Data & Models
 Before running any training or testing, download all required folders (data, preprocessed, models):
 
-```bash
+
 python src/download_data.py
 This script automatically downloads the shared Google Drive folder:
 
-ruby
-Copy code
+
 https://drive.google.com/drive/folders/1q_LOeGmRC0b33faVXxJIQUMmpODC9Ayh?usp=sharing
 All files will be stored in your current working directory.
 
@@ -65,8 +63,7 @@ All files will be stored in your current working directory.
 1️⃣ Test Pre-trained Models
 After downloading data:
 
-bash
-Copy code
+
 python src/test_mlp_upgraded.py \
   --test-path "../data/test_data.npy" \
   --codes-path "../data/cleaned_unique_icd10_codes.txt" \
@@ -76,14 +73,12 @@ python src/test_mlp_upgraded.py \
   --out-csv "../outputs/mlp_v1/seed_42/blendpred_seed_42.csv"
 Then ensemble all prediction CSVs:
 
-bash
-Copy code
+
 python src/generate_submission.py
 2️⃣ Train From Scratch (Optional)
 Example for seed 42:
 
-bash
-Copy code
+
 python src/train_mlp_upgraded.py \
   --data-dir "D:/Kaggle/preprocessed" \
   --out-dir "D:/Kaggle/outputs/mlp_v1/seed_42" \
@@ -93,8 +88,7 @@ python src/train_mlp_upgraded.py \
 3️⃣ Optimize Thresholds
 Run threshold optimization for each seed:
 
-bash
-Copy code
+
 python src/optimize_thresholds.py \
   --X-val "../outputs/mlp_v1/seed_42/splits_scaled/X_val.npy" \
   --Y-val "../outputs/mlp_v1/seed_42/splits_scaled/Y_val.npy" \
@@ -109,12 +103,10 @@ python src/optimize_thresholds.py \
 4️⃣ Blend Thresholds
 Combine optimized thresholds across seeds:
 
-bash
-Copy code
+
 python src/threshold_blender.py
 5️⃣ Final Testing with Blended Thresholds
-bash
-Copy code
+
 python src/test_mlp_upgraded.py \
   --test-path "../data/test_data.npy" \
   --codes-path "../data/cleaned_unique_icd10_codes.txt" \
@@ -124,8 +116,7 @@ python src/test_mlp_upgraded.py \
   --out-csv "../outputs/mlp_v1/seed_42/blendpred_seed_42.csv"
 Then ensemble all blended predictions:
 
-bash
-Copy code
+
 python src/generate_submission.py
 📊 Results
 Metric	Score
@@ -133,16 +124,13 @@ Micro-F₂	0.533
 Rank	1 / Leaderboard
 
 ⚙️ Requirements
-nginx
-Copy code
+
 python >= 3.10
 torch >= 2.0
 numpy, pandas, scikit-learn
 gdown, tqdm
 Install:
 
-bash
-Copy code
 pip install -r requirements.txt
 🏁 Conclusion
 This repository demonstrates that deep residual MLPs, when combined with asymmetric loss and threshold ensembling, can outperform heavier transformer models on structured clinical embeddings while remaining reproducible and lightweight.
