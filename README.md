@@ -1,71 +1,101 @@
-MLP Model Pipeline – README
-Overview
+# 🩺 ICD-10 Multi-Label Text Embedding Classification  
+**PALS TurboTech Build Hackathon 2025**  
+**Team AURA – KCG College of Technology, Karapakkam**  
+**Team Members:** Raji S | Rahul R  
+**Rank 1 | Micro-F₂ = 0.533**
 
-This repository contains a full pipeline for training, optimizing, and testing a Multi-Layer Perceptron (MLP) model for multi-label classification tasks. The workflow includes:
+---
 
-Downloading datasets
+## 📄 Abstract
+We addressed the ICD-10 medical coding challenge as a multi-label text embedding classification problem. Each electronic health record (EHR) embedding represents one or more diagnostic conditions mapped to ICD-10 codes. Our solution leverages a deep residual multi-layer perceptron (MLP) optimized with Asymmetric Loss (ASL) to effectively handle severe label imbalance and capture non-linear relationships across medical embeddings. Through systematic preprocessing, normalization, and stratified data splitting, we ensured reproducibility and robust validation. Our model achieved a final **micro-F₂ score of 0.533**, securing **Rank 1 on the official leaderboard**, demonstrating superior generalization and performance on unseen clinical embeddings.
 
-Training models with multiple seeds
+---
 
-Optimizing prediction thresholds
+## 🧠 Methodology Overview
+1. **Data Preparation**  
+   - Preprocessed embeddings and multi-hot ICD-10 label vectors.  
+   - Normalization with `StandardScaler` (parameters saved for reproducibility).  
+   - Stratified train–validation split preserving label distribution.  
 
-Testing models with blended thresholds
+2. **Model Architecture**  
+   - Deep Residual MLP with 4 layers: `[1024 → 512 → 512 → 256]` + skip connections.  
+   - `ReLU` activations and dropout (0.4) after each layer for regularization.  
+   - Sigmoid output for multi-label classification.  
 
-Generating final submission
+3. **Loss Function**  
+   - **Asymmetric Loss (ASL)** to handle extreme label imbalance and boost rare-label recall.  
 
-The workflow is designed for code reusability and easy replication across different seeds or datasets.
+4. **Multi-Seed Training & Ensembling**  
+   - Trained 10 models with different random seeds for robustness.  
+   - Per-label threshold optimization and blending for stable predictions.  
 
-1. Download Datasets
+---
 
-Run the following command to download all required datasets:
+## 📂 Repository Structure
+├── src/
+│ ├── train_mlp_upgraded.py
+│ ├── test_mlp_upgraded.py
+│ ├── optimize_thresholds.py
+│ ├── threshold_blender.py
+│ ├── generate_submission.py
+│ └── download_data.py
+└── README.md
 
-python download_data.py
+yaml
+Copy code
 
-2. Training Models
+> **Note:**  
+> Datasets, preprocessed embeddings, and trained models are hosted on Google Drive.
 
-Train the upgraded MLP model using different random seeds. Update --data-dir and --out-dir as needed.
+---
 
-Training Commands
-# Seed 42
-python train_mlp_upgraded.py \
+## 📥 Downloading Data & Models
+Before running any training or testing, download all required folders (data, preprocessed, models):
+
+```bash
+python src/download_data.py
+This script automatically downloads the shared Google Drive folder:
+
+ruby
+Copy code
+https://drive.google.com/drive/folders/1q_LOeGmRC0b33faVXxJIQUMmpODC9Ayh?usp=sharing
+All files will be stored in your current working directory.
+
+🚀 Quick Start
+1️⃣ Test Pre-trained Models
+After downloading data:
+
+bash
+Copy code
+python src/test_mlp_upgraded.py \
+  --test-path "../data/test_data.npy" \
+  --codes-path "../data/cleaned_unique_icd10_codes.txt" \
+  --model-path "../outputs/mlp_v1/seed_42/best_mlp.pt" \
+  --scaler-path "../outputs/mlp_v1/seed_42/splits_scaled/scaler.json" \
+  --thresholds-path "../outputs/mlp_v1/seed_42/thresholds_greedy/thresholds_blend.npy" \
+  --out-csv "../outputs/mlp_v1/seed_42/blendpred_seed_42.csv"
+Then ensemble all prediction CSVs:
+
+bash
+Copy code
+python src/generate_submission.py
+2️⃣ Train From Scratch (Optional)
+Example for seed 42:
+
+bash
+Copy code
+python src/train_mlp_upgraded.py \
   --data-dir "D:/Kaggle/preprocessed" \
   --out-dir "D:/Kaggle/outputs/mlp_v1/seed_42" \
   --seed 42 \
   --epochs 30 \
   --batch-size 512
+3️⃣ Optimize Thresholds
+Run threshold optimization for each seed:
 
-# Seed 123
-python train_mlp_upgraded.py \
-  --data-dir "D:/Kaggle/preprocessed" \
-  --out-dir "D:/Kaggle/outputs/mlp_v1/seed_123" \
-  --seed 123 \
-  --epochs 30 \
-  --batch-size 512
-
-# Seed 2025
-python train_mlp_upgraded.py \
-  --data-dir "D:/Kaggle/preprocessed" \
-  --out-dir "D:/Kaggle/outputs/mlp_v1/seed_2025" \
-  --seed 2025 \
-  --epochs 30 \
-  --batch-size 512
-
-# Seed 777
-python train_mlp_upgraded.py \
-  --data-dir "D:/Kaggle/preprocessed" \
-  --out-dir "D:/Kaggle/outputs/mlp_v1/seed_777" \
-  --seed 777 \
-  --epochs 30 \
-  --batch-size 512
-
-
-Repeat this process for all seeds you plan to use.
-
-3. Optimize Thresholds
-
-After training, optimize the prediction thresholds using validation data for each seed. Adjust --init-threshold, --grid-start, --grid-end, --grid-steps, and --max-iters for fine-tuning.
-
-python optimize_thresholds.py \
+bash
+Copy code
+python src/optimize_thresholds.py \
   --X-val "../outputs/mlp_v1/seed_42/splits_scaled/X_val.npy" \
   --Y-val "../outputs/mlp_v1/seed_42/splits_scaled/Y_val.npy" \
   --model-path "../outputs/mlp_v1/seed_42/best_mlp.pt" \
@@ -76,47 +106,50 @@ python optimize_thresholds.py \
   --grid-start 0.30 --grid-end 0.70 --grid-steps 41 \
   --max-iters 3 \
   --batch-size 512
+4️⃣ Blend Thresholds
+Combine optimized thresholds across seeds:
 
-
-Repeat this step for each seed.
-
-4. Blend Thresholds
-
-Once all thresholds are optimized, blend them to improve final predictions:
-
-python threshold_blender.py
-
-
-This script generates blended thresholds for testing.
-
-5. Test Models
-
-Test all upgraded models using the blended thresholds:
-
-# Seed 42
-python test_mlp_upgraded.py \
+bash
+Copy code
+python src/threshold_blender.py
+5️⃣ Final Testing with Blended Thresholds
+bash
+Copy code
+python src/test_mlp_upgraded.py \
   --test-path "../data/test_data.npy" \
   --codes-path "../data/cleaned_unique_icd10_codes.txt" \
   --model-path "../outputs/mlp_v1/seed_42/best_mlp.pt" \
   --scaler-path "../outputs/mlp_v1/seed_42/splits_scaled/scaler.json" \
   --thresholds-path "../outputs/mlp_v1/seed_42/thresholds_greedy/thresholds_blend.npy" \
   --out-csv "../outputs/mlp_v1/seed_42/blendpred_seed_42.csv"
+Then ensemble all blended predictions:
 
+bash
+Copy code
+python src/generate_submission.py
+📊 Results
+Metric	Score
+Micro-F₂	0.533
+Rank	1 / Leaderboard
 
-Repeat for all seeds: 123, 2025, 777, 999, etc.
+⚙️ Requirements
+nginx
+Copy code
+python >= 3.10
+torch >= 2.0
+numpy, pandas, scikit-learn
+gdown, tqdm
+Install:
 
-6. Generate Submission
+bash
+Copy code
+pip install -r requirements.txt
+🏁 Conclusion
+This repository demonstrates that deep residual MLPs, when combined with asymmetric loss and threshold ensembling, can outperform heavier transformer models on structured clinical embeddings while remaining reproducible and lightweight.
 
-Finally, generate the submission file:
+🔗 References
+ICD-10 Challenge Dataset (Kaggle Platform)
 
-python generate_submission.py
+PALS TurboTech Build Hackathon 2025
 
-Notes
-
-Ensure all directory paths exist before running scripts.
-
-Recommended batch size: 512. Adjust depending on available GPU/CPU memory.
-
-The workflow is seed-agnostic: simply add or remove seeds as needed.
-
-Maintain consistent directory structure to ensure reusability.
+KCG College of Technology
