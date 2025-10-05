@@ -137,9 +137,11 @@ gdown, tqdm
 Install:
 
 pip install -r requirements.txt
+
+---
 🏁 Conclusion
 This repository demonstrates that deep residual MLPs, when combined with asymmetric loss and threshold ensembling, can outperform heavier transformer models on structured clinical embeddings while remaining reproducible and lightweight.
-
+---
 🔗 References
 ICD-10 Challenge Dataset (Kaggle Platform)
 
