@@ -76,10 +76,11 @@ Then ensemble all prediction CSVs:
 
 python src/generate_submission.py
 ---
+```bash
 2️⃣ Train From Scratch (Optional)
 Example for seed 42:
 
-```bash
+
 python src/train_mlp_upgraded.py \
   --data-dir "D:/Kaggle/preprocessed" \
   --out-dir "D:/Kaggle/outputs/mlp_v1/seed_42" \
@@ -126,7 +127,7 @@ python src/generate_submission.py
 Metric	Score
 Micro-F₂	0.533
 Rank	1 / Leaderboard
-
+```
 ⚙️ Requirements
 
 python >= 3.10
